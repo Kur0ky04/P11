@@ -1,0 +1,1 @@
+export const API_ENDPOINT = 'https://silvestre-4.onrender.com/api';
