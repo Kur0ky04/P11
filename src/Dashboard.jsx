@@ -89,7 +89,7 @@ function Dashboard() {
     }
   };
 
-  const deleteUser = async (user_id) => {
+   const deleteUser = async (user_id) => {
     const isConfirm = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -124,49 +124,70 @@ function Dashboard() {
     }
   };
 
-  const createUser = async (e) => {
+   const createUser = async (e) => {
     e.preventDefault();
 
+    // Check if all fields are filled
     if (!fullname || !username || !password) {
-      Swal.fire({
-        icon: "warning",
-        text: "All fields are required."
-      });
-      return;
+        Swal.fire({
+            icon: "warning",
+            text: "All fields are required."
+        });
+        return;
     }
 
     try {
-      const { data } = await axios.post(`${API_ENDPOINT}/user`, {
-        fullname,
-        username,
-        password
-      }, { headers: getHeaders() });
+        const { data } = await axios.post(
+            `${API_ENDPOINT}/user`,
+            {
+                fullname,
+                username,
+                password,
+            },
+            { headers: getHeaders() }
+        );
 
-      Swal.fire({
-        icon: "success",
-        text: data.message
-      });
+        // Log the API response for debugging
+        console.log("API Response:", data);
 
-      setFullname("");
-      setUsername("");
-      setPassword("");
-      setUsers([...users, data.newUser]);
-      setShowCreate(false);
+        // Show success message
+        Swal.fire({
+            icon: "success",
+            text: "User created successfully.",
+        });
+
+        // Clear form fields
+        setFullname("");
+        setUsername("");
+        setPassword("");
+
+        // Update the users list with the newly created user
+        // Assuming the API response returns the new user object (id, fullname, username)
+        const newUser = data;  // The response structure should match this
+        if (newUser) {
+            setUsers((prevUsers) => [...prevUsers, newUser]);
+        } else {
+            console.warn("No new user found in API response. Verify API response structure.");
+        }
+
+        // Close the modal
+        setShowCreate(false);
     } catch (error) {
-      const errorMessage = error.response
-        ? error.response.data?.message || 'Failed to create user. Please try again.'
-        : error.message || 'An unexpected error occurred.';
+        console.error("Create User Error:", error);
 
-      Swal.fire({
-        text: errorMessage,
-        icon: "error"
-      });
+        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
+        Swal.fire({
+            text: errorMessage,
+            icon: "error"
+        });
     }
-  };
+};
+
 
   const updateUser = async (e) => {
     e.preventDefault();
-
+  
+    // Validate that required fields are provided
     if (!fullname || !username) {
       Swal.fire({
         icon: "warning",
@@ -174,42 +195,49 @@ function Dashboard() {
       });
       return;
     }
-
+  
+    // Prepare update data
     const updateData = {
       fullname,
       username,
-      password: password || undefined, // Only include password if provided
+      password // Send password as-is; backend hashes it
     };
-
+  
     try {
+      // Make PUT request to the backend
       const { data } = await axios.put(
         `${API_ENDPOINT}/user/${selectedUser.user_id}`,
         updateData,
         { headers: getHeaders() }
       );
-
-      // Check if the response contains updated user data
-      if (data?.updatedUser) {
-        Swal.fire({
-          icon: "success",
-          text: "User successfully updated."
-        });
-
-        setUsers(users.map(user => 
-          user.user_id === selectedUser.user_id ? data.updatedUser : user
-        ));
-      } else {
-        throw new Error("Failed to update user. Response does not contain updated data.");
-      }
-
-      setShowUpdate(false); // Close modal after successful update
+  
+      console.log("API Response:", data); // Debugging: Log the API response
+  
+      // Check if the response contains a success message
+      Swal.fire({
+        icon: "success",
+        text: data.message || "User successfully updated."
+      });
+  
+      // Update the users list in the state
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.user_id === selectedUser.user_id
+            ? { ...user, fullname, username } // Update only fullname and username; password isn't displayed
+            : user
+        )
+      );
+  
+      // Reset form fields and close modal
+      setFullname("");
+      setUsername("");
+      setPassword("");
+      setShowUpdate(false);
     } catch (error) {
-      console.error("Update error:", error);
-
-      const errorMessage = error.response
-        ? error.response.data?.message || 'Failed to update user. Please try again.'
-        : error.message || 'An unexpected error occurred.';
-
+      console.error("Update User Error:", error); // Log error for debugging
+  
+      // Handle errors, including cases when the user is not found
+      const errorMessage = error.response?.data?.error || "Failed to update user. Please try again.";
       Swal.fire({
         text: errorMessage,
         icon: "error"
