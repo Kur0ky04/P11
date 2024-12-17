@@ -4,6 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import "bootstrap/dist/css/bootstrap.css";
 
+import Music from './Music';
 // Importing components
 import Dashboard from './Dashboard';
 import Login from './Login';
@@ -34,6 +35,7 @@ function App() {
               {/* Explicit login route */}
               <Route path="/login" element={<Login />} />
               
+              <Route path="/music" element={<Music />} />
               {/* Register route */}
               <Route path="/register" element={<Register />} />
               

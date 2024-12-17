@@ -265,13 +265,14 @@ function Dashboard() {
           <Navbar.Brand href="#home" className="text-white font-weight-bold">Voting System ni Roi</Navbar.Brand>
           <Nav className="me-auto"></Nav>
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <NavDropdown title={user ? user.username : 'Dropdown'} id="basic-nav-dropdown" align="end">
-                <NavDropdown.Item href="#">Profile</NavDropdown.Item>
-                <NavDropdown.Item href="#">Settings</NavDropdown.Item>
-                <NavDropdown.Item href="#" onClick={handleLogout}>Logout</NavDropdown.Item>
-              </NavDropdown>
-            </Nav>
+          <Nav className="ms-auto">
+  <NavDropdown title={user ? user.username : 'Dropdown'} id="basic-nav-dropdown" align="end">
+    <NavDropdown.Item href="#">Profile</NavDropdown.Item>
+    <NavDropdown.Item href="#">Settings</NavDropdown.Item>
+    <NavDropdown.Item href="#" onClick={handleLogout}>Logout</NavDropdown.Item>
+  </NavDropdown>
+  <Nav.Link href="/music">Music</Nav.Link> {/* Add this line */}
+</Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
